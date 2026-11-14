@@ -867,5 +867,33 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
 
 })();
 </script>
+<script>
+/* Analytics: GoatCounter, no cookies. Counts the visit, how far people scroll, and what they click. */
+(function () {
+  function ev(name, title) { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: title || name, event: true }); } catch (e) {} }
+  var seen = {};
+  function once(name) { if (seen[name]) return; seen[name] = 1; ev(name); }
+  var spots = [['reach-bio', '#bio'], ['reach-zepto', '#zepto'], ['reach-onit', '#work .proj:nth-of-type(1)'], ['reach-parakh', '#work .proj:nth-of-type(2)'], ['reach-lately', '#feed']];
+  function watch() {
+    if (!('IntersectionObserver' in window)) return;
+    spots.forEach(function (s) { var el = document.querySelector(s[1]); if (!el) return; var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { once(s[0]); io.disconnect(); } }, { rootMargin: '0px 0px -35% 0px' }); io.observe(el); });
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a, button'); if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (a.id === 'copyMail') return ev('click-mail', 'Copied the email');
+    if (a.classList.contains('xpost')) return ev('click-post', 'Opened an X post');
+    if (/ndtv\.com/.test(h)) return ev('click-ndtv');
+    if (/(x|twitter)\.com\/yashwik\/?$/.test(h)) return ev('click-x');
+    if (/linkedin\.com/.test(h)) return ev('click-linkedin');
+    if (/github\.com\/kachao27\/?$/.test(h)) return ev('click-github');
+    if (/zepto\.com/.test(h)) return ev('click-zepto');
+    if (/heyonit\.xyz/.test(h)) return ev('click-onit');
+    if (/parakhsebigff/.test(h)) return ev('click-parakh');
+  }, true);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(watch, 600); }); else setTimeout(watch, 600);
+})();
+</script>
+<script data-goatcounter="https://yashwik.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
