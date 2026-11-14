@@ -194,9 +194,13 @@
   /* feed */
   .feed { max-width: 960px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 16vh max(16px, env(safe-area-inset-left, 0px)); }
   .feed .ph { border-bottom: 1px solid var(--line); margin-bottom: 18px; }
-  .feed .tl { max-width: 600px; min-height: 80px; }
-  .feed a.twitter-timeline { display: inline-block; color: var(--muted); font-size: 15px; text-decoration: none; padding: 14px 0; }
-  .feed a.twitter-timeline:hover { color: var(--text); }
+  .xcard { display: flex; align-items: center; gap: 18px; max-width: 600px; padding: 22px 24px; border-radius: 16px; border: 1px solid var(--line); text-decoration: none; color: var(--text); transition: border-color .3s, background-color .3s; }
+  .xcard:hover { border-color: rgba(255,255,255,.32); background-color: rgba(255,255,255,.025); }
+  .xmark { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); font-size: 20px; }
+  .xbody { display: grid; gap: 6px; }
+  .xline { font-size: 16px; line-height: 1.45; }
+  .xgo { font-size: 14px; color: var(--muted); }
+  .xcard:hover .xgo { color: var(--text); }
   .feed.rv { opacity: 0; transform: translateY(14px); transition: opacity 1s var(--ease), transform 1.2s var(--ease); }
   .feed.rv.in { opacity: 1; transform: none; }
 
@@ -321,6 +325,9 @@
   .nvpair .row3 .tile { width: 100%; aspect-ratio: 4 / 3; }
   @media (max-width: 760px) { .nvpair { grid-template-columns: minmax(0, 1fr); } .nvpair .row3 .tile { flex: none; } }
   @media (prefers-reduced-motion: reduce) { .nvz *, .nvz { animation: none !important; } .nvz .new { opacity: 1 !important; } .nvz .old { opacity: 0 !important; } }
+  /* Option C only: the name in the smooth serif, centred at the top of the page, not fixed */
+  .sigbar { display: none; }
+  .sig { position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); font-family: var(--serif); font-variation-settings: "SOFT" 100, "WONK" 0; font-weight: 400; font-size: clamp(20px, 1.8vw, 26px); letter-spacing: -0.01em; line-height: 1.2; color: rgba(255,255,255,.9); }
 </style>
 </head>
 <body>
@@ -435,7 +442,10 @@
 
   <section class="feed" id="feed">
     <header class="ph"><h2>Lately</h2><span class="pn">on X</span><a class="pl" href="https://x.com/yashwik" target="_blank" rel="noopener">@yashwik ↗</a></header>
-    <div class="tl"><a class="twitter-timeline" data-theme="dark" data-chrome="noheader nofooter noborders transparent" data-height="680" data-dnt="true" href="https://twitter.com/yashwik">Read the latest from @yashwik on X</a></div>
+    <a class="xcard" href="https://x.com/yashwik" target="_blank" rel="noopener">
+      <span class="xmark" aria-hidden="true">𝕏</span>
+      <span class="xbody"><span class="xline">What I’m building and what I’m learning, as it happens.</span><span class="xgo">Follow @yashwik ↗</span></span>
+    </a>
   </section>
 </main>
 
@@ -668,63 +678,69 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
   pin.addEventListener('pointerleave', function () { mxT = 0; });
 
 
-  /* Gateway hero: a threshold drawn in light. Circles gather inside it, one set per line, until they form a lotus.
-     The light moves from blue to orange as the sun comes up. */
+  /* Option C, seeds: dotted lines scatter into a storm, the storm settles into complete rings,
+     and the rings open into a seed head shaped like petals. */
+  var FALL = 1;
+  function fallA(i, n) { return clamp((ease(FALL) - i / n * 0.85) / 0.15); }
+  var CN = 1100, GA = Math.PI * (3 - Math.sqrt(5)), CR = rng(21), CRND = [];
+  for (var cq = 0; cq < CN; cq++) CRND.push([CR(), CR(), CR()]);
+  function shapeC(st, kk, g, t) {
+    var a0 = -0.74, a1 = g.vb - 0.26, rows = 22, per = CN / rows, row = Math.floor(kk / per), tt = (kk % per) / per, C = 0.32, u = kk / CN, q = CRND[kk];
+    if (st === 0) { var y0 = a0 + (a1 - a0) * (row + 0.5) / rows, yf = a0 + (y0 - a0) * ease(FALL); return [(tt * 2 - 1) * halfW(yf), yf]; }
+    if (st === 1) { var rr = 0.12 + 0.76 * Math.sqrt(q[0]), th = q[1] * 6.283 + t * (0.5 - rr * 0.45) * (q[2] < 0.5 ? 1 : -1), wob = 0.05 * Math.sin(t * 1.3 + q[2] * 20); return [Math.cos(th) * (rr + wob), C + Math.sin(th) * (rr + wob) * 1.1]; }
+    if (st === 2) { var R = 0.06 + 0.8 * (row + 0.5) / rows, th2 = tt * 6.283 - 1.5 * Math.PI + t * 0.02 * (row % 2 ? 1 : -1); return [Math.cos(th2) * R, C + Math.sin(th2) * R]; }
+    var r2 = 0.86 * Math.sqrt(u), a = kk * GA + t * 0.03, pet = 0.78 + 0.22 * Math.abs(Math.cos(4 * a)), r3 = r2 * pet;
+    return [Math.cos(a) * r3, C + Math.sin(a) * r3];
+  }
+  function INNER(g, p, s, k, t) {
+    FALL = reduced ? 1 : clamp(p / 0.13);
+    var i0 = Math.min(2, Math.floor(s)), f = s - i0, sz = g.wide ? 2 : 1.6;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (var kk = 0; kk < CN; kk++) {
+      var u = kk / CN, lf = ease(clamp(f * 1.25 - CRND[kk][2] * 0.25)), A = shapeC(i0, kk, g, t), B = shapeC(i0 + 1, kk, g, t), x = A[0] + (B[0] - A[0]) * lf, y = A[1] + (B[1] - A[1]) * lf;
+      var col = s > 2 ? mix(mix(ORNG, BLUE, u), GOLD, clamp(s - 2) * (1 - u * 0.6)) : mix(BLUE, ORNG, u), z = sz * (s > 2 ? 1 + clamp(s - 2) * (1 - u) * 0.8 : 1);
+      ctx.fillStyle = rgb(col, 0.85 * fallA(Math.floor(kk / (CN / 22)), 22)); ctx.fillRect(g.cx + x * g.r - z / 2, g.ay + y * g.r - z / 2, z, z);
+    }
+    if (s > 2) { var bl = ctx.createRadialGradient(g.cx, g.ay + g.r * 0.32, 0, g.cx, g.ay + g.r * 0.32, g.r); bl.addColorStop(0, rgb(GOLD, 0.25 * clamp(s - 2))); bl.addColorStop(1, rgb(GOLD, 0)); ctx.fillStyle = bl; ctx.fillRect(g.cx - g.r, g.top, g.gw, g.gh); }
+    ctx.restore();
+  }
+  /* Gateway hero, seeds. The gateway starts complete. Each line changes what lives inside it. */
+  (function tick() { lastKey = ''; requestAnimationFrame(tick); })();
+  var HB = [0.22, 0.45, 0.68];
+  function stageAt(p) { var s = 0; for (var i = 0; i < 3; i++) s += ease(clamp((p - (HB[i] - 0.07)) / 0.19)); return s; }
+  function halfW(v) { return (v < 0 ? Math.sqrt(Math.max(0, 1 - v * v)) : 1) - 0.16; }
+  function gateGeom(W, H) { var wide = W > 760, gw = wide ? Math.min(W * 0.22, H * 0.46) : Math.min(W * 0.6, H * 0.32), gh = wide ? H * 0.7 : gw * 1.45, top = wide ? H * 0.15 : H * 0.08; return { wide: wide, gw: gw, gh: gh, cx: W * (wide ? 0.8 : 0.5) + mx * 4, top: top, base: top + gh, r: gw / 2, ay: top + gw / 2, vb: (gh - gw / 2) / (gw / 2) }; }
+  function gatePath(g, ins) { var rr = g.r - ins; ctx.beginPath(); ctx.moveTo(g.cx - rr, g.base); ctx.lineTo(g.cx - rr, g.ay); ctx.arc(g.cx, g.ay, rr, Math.PI, 0); ctx.lineTo(g.cx + rr, g.base); }
+  function slots(g) { var a = -0.72, b = g.vb - 0.3; return [a + (b - a) * 0.17, a + (b - a) * 0.5, a + (b - a) * 0.83, (b - a) / 3]; }
+  var WORDS = ['chaos', 'शोर', 'noise', 'signal', 'इरादा', 'intent', 'pattern', 'अर्थ', 'meaning', 'possibility', 'संभावना', 'order'];
+  var BLUE = [110, 140, 255], ORNG = [255, 146, 82], GOLD = [255, 206, 150];
   draw = function (p, t) {
     var W = frame.clientWidth, H = frame.clientHeight; if (!W || !H) return;
     var sc = cv.width / W; ctx.setTransform(sc, 0, 0, cv.height / H, 0, 0);
-    var k = ease(clamp(p / 0.9)), wide = W > 760, i, j;
+    if (reduced) t = 0;
+    var k = ease(clamp(p / 0.9)), s = stageAt(p), g = gateGeom(W, H), low = mix(BLUE, ORNG, k), i;
     ctx.fillStyle = '#070912'; ctx.fillRect(0, 0, W, H);
-    var gw = wide ? Math.min(W * 0.22, H * 0.46) : Math.min(W * 0.6, H * 0.32), gh = wide ? H * 0.7 : gw * 1.45;
-    var cx = W * (wide ? 0.8 : 0.5) + mx * 4, top = wide ? H * 0.15 : H * 0.08, base = top + gh, r = gw / 2;
-    var BLUE = [110, 140, 255], ORNG = [255, 146, 82], DEEP = [40, 50, 120];
-    var low = mix(BLUE, ORNG, k);
-    // floor light: the threshold throws light forward
-    ctx.save(); ctx.beginPath(); ctx.rect(0, base, W, H - base); ctx.clip(); ctx.translate(cx, base); ctx.scale(1, 0.32);
-    var fl = ctx.createRadialGradient(0, 0, 0, 0, 0, gw * 2); fl.addColorStop(0, rgb(low, (wide ? 0.1 : 0.06) + (wide ? 0.24 : 0.14) * k)); fl.addColorStop(1, rgb(low, 0));
-    ctx.fillStyle = fl; ctx.fillRect(-gw * 2.2, 0, gw * 4.4, gw * 2.2); ctx.restore();
-    var hz = ctx.createLinearGradient(0, 0, W, 0); hz.addColorStop(0, rgb(low, 0)); hz.addColorStop(cx / W, rgb(low, 0.55)); hz.addColorStop(1, rgb(low, 0));
-    ctx.fillStyle = hz; ctx.fillRect(0, Math.round(base), W, 1);
-    function half(ins, s) { var rr = r - ins, ay = top + r; ctx.beginPath(); ctx.moveTo(cx + s * rr, base); ctx.lineTo(cx + s * rr, ay); ctx.arc(cx, ay, rr, s < 0 ? Math.PI : 0, -Math.PI / 2, s > 0); }
-    function gate(ins) { var x0 = cx - r + ins, x1 = cx + r - ins, rr = r - ins, ay = top + r; ctx.beginPath(); ctx.moveTo(x0, base); ctx.lineTo(x0, ay); ctx.arc(cx, ay, rr, Math.PI, 0); ctx.lineTo(x1, base); }
-    // inside the threshold: light rising from the floor
-    gate(0); ctx.closePath();
-    var inner = ctx.createLinearGradient(0, top, 0, base);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, g.base, W, H - g.base); ctx.clip(); ctx.translate(g.cx, g.base); ctx.scale(1, 0.32);
+    var fl = ctx.createRadialGradient(0, 0, 0, 0, 0, g.gw * 2); fl.addColorStop(0, rgb(low, (g.wide ? 0.1 : 0.06) + (g.wide ? 0.24 : 0.14) * k)); fl.addColorStop(1, rgb(low, 0));
+    ctx.fillStyle = fl; ctx.fillRect(-g.gw * 2.2, 0, g.gw * 4.4, g.gw * 2.2); ctx.restore();
+    var hz = ctx.createLinearGradient(0, 0, W, 0); hz.addColorStop(0, rgb(low, 0)); hz.addColorStop(g.cx / W, rgb(low, 0.55)); hz.addColorStop(1, rgb(low, 0)); ctx.fillStyle = hz; ctx.fillRect(0, Math.round(g.base), W, 1);
+    gatePath(g, 0); ctx.closePath();
+    var inner = ctx.createLinearGradient(0, g.top, 0, g.base);
     inner.addColorStop(0, rgb(mix([10, 12, 30], [30, 38, 92], k))); inner.addColorStop(0.6, rgb(mix([14, 18, 46], [120, 80, 120], k))); inner.addColorStop(1, rgb(mix([28, 36, 90], [255, 150, 90], k)));
     ctx.fillStyle = inner; ctx.fill();
-    // the sun, low inside the threshold, half behind the floor line
-    ctx.save(); gate(0); ctx.closePath(); ctx.clip();
-    var sy = base + r * 0.5 - k * r * 0.95, sr = r * 0.5, sg = ctx.createRadialGradient(cx, sy, 0, cx, sy, sr * 2.2);
+    ctx.save(); gatePath(g, 0); ctx.closePath(); ctx.clip();
+    var sy = g.base + g.r * 0.5 - k * g.r * 0.95, sr = g.r * 0.5, sg = ctx.createRadialGradient(g.cx, sy, 0, g.cx, sy, sr * 2.2);
     sg.addColorStop(0, 'rgba(255,214,160,' + (0.9 * k).toFixed(3) + ')'); sg.addColorStop(0.35, 'rgba(255,150,90,' + (0.5 * k).toFixed(3) + ')'); sg.addColorStop(1, 'rgba(255,150,90,0)');
-    ctx.fillStyle = sg; ctx.fillRect(cx - r, top, gw, gh); ctx.restore();
-    // nested thresholds: each one draws in from the floor
-    var NG = 5, step = gw * 0.055, perim = function (ins) { var rr = r - ins; return 2 * (gh - r) + Math.PI * rr; };
-    for (i = NG - 1; i >= 0; i--) {
-      var ins = -i * step, f = ease(clamp(p * 3.2 - i * 0.18 + 0.25)), L = perim(ins);
-      if (f <= 0) continue;
-      var sgr = ctx.createLinearGradient(0, top - i * step, 0, base); sgr.addColorStop(0, rgb(mix(BLUE, [255, 200, 160], k * 0.35), 0.85 - i * 0.14)); sgr.addColorStop(1, rgb(low, 0.95 - i * 0.15));
-      ctx.strokeStyle = sgr; ctx.lineWidth = i ? 1 : 1.6; ctx.setLineDash([L / 2 * f, L]); ctx.lineDashOffset = 0;
-      half(ins, -1); ctx.stroke(); half(ins, 1); ctx.stroke();
-    }
-    ctx.setLineDash([]);
-    // circles gather into a lotus: 1, then 3, 6 and 12
-    var lc = top + r * 1.05, rc = r * 0.3, rot = -Math.PI / 2 + p * 0.9 + mx * 0.1;
-    var STG = [[0, 1], [0.22, 3], [0.45, 6], [0.68, 12]], n = 1;
-    for (i = 0; i < STG.length; i++) if (p >= STG[i][0]) n = STG[i][1] * Math.min(1, (p - STG[i][0]) / 0.1) + (i ? STG[i - 1][1] : 0) * (1 - Math.min(1, (p - STG[i][0]) / 0.1));
-    var N = Math.ceil(n), spin = (p >= 0.68) ? 12 : (p >= 0.45 ? 6 : (p >= 0.22 ? 3 : 1));
-    ctx.save(); ctx.globalCompositeOperation = 'lighter';
-    for (i = 0; i < spin; i++) {
-      var a = rot + i / spin * Math.PI * 2, x = cx + Math.cos(a) * (spin > 1 ? rc : 0), y = lc + Math.sin(a) * (spin > 1 ? rc : 0);
-      var appear = clamp(n - i), g = ctx.createRadialGradient(x, y, 0, x, y, rc);
-      var col = mix(mix(BLUE, ORNG, k), [255, 220, 190], 0.15);
-      g.addColorStop(0, rgb(col, 0.02 * appear)); g.addColorStop(1, rgb(col, 0.1 * appear));
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rc, 0, 6.283); ctx.fill();
-      ctx.strokeStyle = rgb(col, 0.75 * appear); ctx.lineWidth = 1.2; ctx.stroke();
-    }
+    ctx.fillStyle = sg; ctx.fillRect(g.cx - g.r, g.top, g.gw, g.gh);
+    INNER(g, p, s, k, t);
     ctx.restore();
-    // the outer ring closes the monogram on the last line
-    var close = ease(clamp((p - 0.74) / 0.16));
-    if (close > 0) { ctx.strokeStyle = rgb(mix(BLUE, ORNG, k), 0.7 * close); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, lc, rc * 2, rot, rot + Math.PI * 2 * close); ctx.stroke(); }
+    if (typeof AFTER === 'function') AFTER(g, p, s, k, t, W, H);
+    var lift = clamp(s - 2);
+    for (i = 4; i >= 0; i--) {
+      var ins = -i * g.gw * 0.055, sgr = ctx.createLinearGradient(0, g.top - i * g.gw * 0.055, 0, g.base);
+      sgr.addColorStop(0, rgb(mix(BLUE, GOLD, k * 0.5), (0.6 - i * 0.1) * (0.6 + 0.4 * lift))); sgr.addColorStop(1, rgb(low, (0.9 - i * 0.14)));
+      ctx.strokeStyle = sgr; ctx.lineWidth = i ? 1 : 1.6; gatePath(g, ins); ctx.stroke();
+    }
     ctx.save(); ctx.globalAlpha = 0.06; ctx.globalCompositeOperation = 'overlay'; ctx.fillStyle = ctx.createPattern(grain, 'repeat'); ctx.fillRect(0, 0, W, H); ctx.restore();
   };
 
@@ -733,7 +749,7 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
   (function () {
     var sig = document.createElement('a'); sig.className = 'sig'; sig.href = '#top'; sig.textContent = 'Yashwik'; sig.setAttribute('aria-label', 'Yashwik, back to top');
     sig.addEventListener('click', function (e) { e.preventDefault(); if (lenis) lenis.scrollTo(0, { duration: 1.4 }); else window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    var bar = document.createElement('div'); bar.className = 'sigbar'; document.body.appendChild(bar); document.body.appendChild(sig);
+    var bar = document.createElement('div'); bar.className = 'sigbar'; document.body.appendChild(bar); (document.getElementById('pin') || document.body).appendChild(sig);
     var pr = $$('.proj');
     if (pr[0]) { var v = pr[0].querySelector('.pviz'); if (v) v.remove(); var r = pr[0].querySelector('.row3'); if (r) r.remove(); var w = document.createElement('div'); w.className = 'nvwrap nvonit'; w.innerHTML = '<svg class="nvz nv-onit nv-d" viewBox="0 0 1000 400" role="img" aria-label="A handwritten measurement sheet is photographed into WhatsApp, Onit reads it, and the job appears on one screen"><g class="sheet" transform="translate(16 46) rotate(-2.5 145 165)"><rect width="290" height="330" rx="4" class="paper"/><line x1="0" x2="290" y1="34" y2="34" class="rule"/><line x1="0" x2="290" y1="74.9091" y2="74.9091" class="rule"/><line x1="0" x2="290" y1="115.818" y2="115.818" class="rule"/><line x1="0" x2="290" y1="156.727" y2="156.727" class="rule"/><line x1="0" x2="290" y1="197.636" y2="197.636" class="rule"/><line x1="0" x2="290" y1="238.545" y2="238.545" class="rule"/><line x1="0" x2="290" y1="279.455" y2="279.455" class="rule"/><line x1="0" x2="290" y1="320.364" y2="320.364" class="rule"/><line x1="34" x2="34" y1="0" y2="330" class="margin"/><text x="44" y="24" class="hw hwt" style="font-size:16px">Measurements</text><text x="44" y="67.9091" class="hw" style="font-size:18px">Site: Whitefield, 3 BHK</text><text x="44" y="108.818" class="hw" style="font-size:18px">Hall  221 × 190  blackout</text><text x="44" y="149.727" class="hw" style="font-size:18px">Bed 1  216 × 190  sheer</text><text x="44" y="190.636" class="hw" style="font-size:18px">Bed 2  185 × 190  blackout</text><text x="44" y="231.545" class="hw" style="font-size:18px">Fitting: Saturday</text><text x="44" y="272.455" class="hw" style="font-size:18px">Adv. ₹20,000 recd ✓</text><path d="M44 75.9091 q 40 -6 90 -2" class="hwline"/><rect class="scanbar" x="0" y="0" width="290" height="10"/></g><path d="M318 210 H 352" class="flow"/><g class="thread" transform="translate(360 20)"><rect width="300" height="360" rx="16" class="card"/><text x="18" y="28" class="hd">Site team · WhatsApp</text><g class="t1"><rect x="14" y="44" width="150" height="66" rx="12" class="bub-i"/><text x="26" y="62" class="who">Site lead</text><rect x="26" y="70" width="44" height="32" rx="3" class="thumb" transform="rotate(-3 48 86)"/><text x="80" y="92">photo</text></g><g class="t2"><rect x="14" y="122" width="272" height="150" rx="12" class="bub-o"/><text x="26" y="142" class="who">Onit</text><text x="26" y="164">Read 3 windows:</text><text x="26" y="186">Hall  221 × 190 · blackout</text><text x="26" y="208">Bed 1  216 × 190 · sheer</text><text x="26" y="230">Bed 2  185 × 190 · blackout</text><text x="26" y="252" class="em">Quote ₹38,400 sent to owner</text></g><g class="t3"><rect x="174" y="286" width="112" height="34" rx="12" class="bub-me"/><text x="188" y="308">Approved ✓</text></g></g><path d="M668 210 H 694" class="flow"/><g class="dash" transform="translate(700 40)"><rect width="290" height="320" rx="16" class="card"/><text x="18" y="28" class="hd">The business, today</text><rect x="12" y="44" width="266" height="34" rx="8" class="row"/><text x="26" y="66">Quotes</text><text x="264" y="66" class="v old">12</text><text x="264" y="66" class="v new">13</text><rect x="12" y="88" width="266" height="34" rx="8" class="row"/><text x="26" y="110">Jobs</text><text x="264" y="110" class="v old">7</text><text x="264" y="110" class="v new">8</text><rect x="12" y="132" width="266" height="34" rx="8" class="row"/><text x="26" y="154">Payments</text><text x="264" y="154" class="v old">₹4.2L</text><text x="264" y="154" class="v new">₹4.4L</text><g class="newjob"><rect x="12" y="182" width="266" height="126" rx="10" class="hl"/><text x="26" y="204" class="em">New job</text><text x="26" y="226">Whitefield · 3 windows</text><text x="26" y="248" class="dim">Fitting Saturday · advance in</text></g></g></svg>' + '<svg class="nvz nv-onit nv-m" viewBox="0 0 360 700" role="img" aria-label="A handwritten measurement sheet is photographed into WhatsApp, Onit reads it, and the job appears on one screen"><g class="sheet" transform="translate(30 14) rotate(-2.5 150 125)"><rect width="300" height="250" rx="4" class="paper"/><line x1="0" x2="300" y1="34" y2="34" class="rule"/><line x1="0" x2="300" y1="62.7879" y2="62.7879" class="rule"/><line x1="0" x2="300" y1="91.5758" y2="91.5758" class="rule"/><line x1="0" x2="300" y1="120.364" y2="120.364" class="rule"/><line x1="0" x2="300" y1="149.152" y2="149.152" class="rule"/><line x1="0" x2="300" y1="177.939" y2="177.939" class="rule"/><line x1="0" x2="300" y1="206.727" y2="206.727" class="rule"/><line x1="0" x2="300" y1="235.515" y2="235.515" class="rule"/><line x1="34" x2="34" y1="0" y2="250" class="margin"/><text x="44" y="24" class="hw hwt" style="font-size:13px">Measurements</text><text x="44" y="55.7879" class="hw" style="font-size:15px">Site: Whitefield, 3 BHK</text><text x="44" y="84.5758" class="hw" style="font-size:15px">Hall  221 × 190  blackout</text><text x="44" y="113.364" class="hw" style="font-size:15px">Bed 1  216 × 190  sheer</text><text x="44" y="142.152" class="hw" style="font-size:15px">Bed 2  185 × 190  blackout</text><text x="44" y="170.939" class="hw" style="font-size:15px">Fitting: Saturday</text><text x="44" y="199.727" class="hw" style="font-size:15px">Adv. ₹20,000 recd ✓</text><path d="M44 63.7879 q 40 -6 90 -2" class="hwline"/><rect class="scanbar" x="0" y="0" width="300" height="10"/></g><path d="M180 280 V 300" class="flow"/><g class="thread" transform="translate(10 306)"><g class="t2"><rect width="340" height="58" rx="14" class="bub-o"/><text x="16" y="24" class="who">Onit</text><text x="16" y="44">Read 3 windows. Quote sent to owner.</text></g></g><path d="M180 370 V 388" class="flow"/><g class="dash" transform="translate(10 392)"><rect width="340" height="300" rx="16" class="card"/><text x="18" y="28" class="hd">The business, today</text><rect x="12" y="44" width="316" height="34" rx="8" class="row"/><text x="26" y="66">Quotes</text><text x="314" y="66" class="v old">12</text><text x="314" y="66" class="v new">13</text><rect x="12" y="88" width="316" height="34" rx="8" class="row"/><text x="26" y="110">Jobs</text><text x="314" y="110" class="v old">7</text><text x="314" y="110" class="v new">8</text><rect x="12" y="132" width="316" height="34" rx="8" class="row"/><text x="26" y="154">Payments</text><text x="314" y="154" class="v old">₹4.2L</text><text x="314" y="154" class="v new">₹4.4L</text><g class="newjob"><rect x="12" y="182" width="316" height="106" rx="10" class="hl"/><text x="26" y="204" class="em">New job</text><text x="26" y="226">Whitefield · 3 windows</text><text x="26" y="248" class="dim">Fitting Saturday · advance in</text></g></g></svg>'; pr[0].appendChild(w); }
     if (pr[1]) { var tiles = pr[1].querySelectorAll('.row3 .tile'); [0, 2].forEach(function (i) { if (tiles[i]) tiles[i].remove(); }); var pv = pr[1].querySelector('.pviz'), row = pr[1].querySelector('.row3'); var g = document.createElement('div'); g.className = 'nvpair'; row.before(g); g.appendChild(row); if (pv) g.appendChild(pv); }
@@ -763,7 +779,5 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
   requestAnimationFrame(loop);
 })();
 </script>
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
