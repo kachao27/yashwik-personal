@@ -14,7 +14,7 @@
 <title>Yashwik</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Cormorant+Garamond:wght@500&family=Kalam:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..500,100,0&family=Kalam:wght@400&display=swap">
 <style>
   /* Layout: two edges only. The frame, work and footer share the outer edge; the headline, bio and feed share one 960px column. */
   :root {
@@ -242,12 +242,14 @@
   }
 
   /* ---- Gateway variant: a threshold, circles that form a lotus, light that moves from blue to orange ---- */
-  :root { --warm: #f39a5c; --cool: #7f9cff; --serif: "Cormorant Garamond", "Cormorant", Georgia, serif; }
+  :root { --warm: #f39a5c; --cool: #7f9cff; --serif: "Fraunces", Georgia, serif; }
   body { background: #070912; }
   .frame { background: #070912; }
-  .head { font-family: var(--serif); font-weight: 500; letter-spacing: -0.012em; line-height: 1.02; font-size: clamp(2.5rem, 5.8vw, 5.3rem); max-width: 7.6em; }
-  .ph h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(1.9rem, 3vw, 2.7rem); letter-spacing: 0; }
-  .fl.tl { font-family: var(--serif); font-weight: 500; font-size: clamp(1.5rem, 2.2vw, 2.1rem); letter-spacing: 0; }
+  .head, .ph h2, .fl.tl { font-family: var(--serif); font-variation-settings: "SOFT" 100, "WONK" 0; }
+  .head { font-weight: 380; letter-spacing: -0.022em; line-height: 1.08; max-width: 10em; }
+  .pin .head { font-size: clamp(2rem, min(4.6vw, 8vh), 4.4rem); }
+  .ph h2 { font-weight: 400; font-size: clamp(1.8rem, 2.8vw, 2.5rem); letter-spacing: -0.015em; }
+  .fl.tl { font-weight: 400; font-size: clamp(1.4rem, 2vw, 1.9rem); letter-spacing: -0.01em; }
   .tile { border-radius: 18px; background: linear-gradient(180deg, #0d1222, #0a0d18) !important; box-shadow: inset 0 0 0 1px rgba(127,156,255,.22); }
   .tile::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, rgba(127,156,255,0), var(--warm), rgba(127,156,255,0)); opacity: .7; }
   .shot { border-radius: 8px; }
@@ -328,9 +330,9 @@
       <span class="fl br" id="hint">Scroll</span>
     </div>
     <div class="col"><h1 class="head" id="head">
-      <span class="ln">Hindi, English and everything in between.</span>
-      <span class="ln">Voice notes, screenshots, handwritten bills.</span>
-      <span class="ln">This is not a mess to fix. It’s how people work.</span>
+      <span class="ln">Nothing here is designed. It’s learned and passed on.</span>
+      <span class="ln">From the outside, it looks like chaos.</span>
+      <span class="ln">It’s not a mess to fix. It’s how people work.</span>
       <span class="ln">I build AI that works the way India does.</span>
     </h1></div>
   </div>
