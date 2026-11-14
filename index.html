@@ -197,10 +197,12 @@
   .xtl { max-width: 600px; }
   .xtl:not(.on) { position: absolute; left: -9999px; width: 560px; visibility: hidden; }
   .xtl.on { margin-bottom: 18px; }
-  .xposts { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 0 18px; padding-bottom: 6px; }
-  .xposts::-webkit-scrollbar { display: none; }
+  .xposts { display: flex; flex-direction: column; gap: 14px; max-width: 600px; max-height: min(720px, 72vh); overflow-y: auto; overscroll-behavior: contain; margin: 0 0 18px; padding-right: 6px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 48px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 48px), transparent); padding-bottom: 40px; }
+  .xposts::-webkit-scrollbar { width: 6px; } .xposts::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 3px; }
+  .xposts:focus-visible { outline: 1px solid var(--line); outline-offset: 6px; }
+  @media (max-width: 760px), (hover: none) { .xposts { max-height: none; overflow: visible; -webkit-mask-image: none; mask-image: none; padding: 0; } }
   .xposts.off { display: none; }
-  .xpost { flex: 0 0 min(360px, 84%); scroll-snap-align: start; display: flex; flex-direction: column; gap: 12px; padding: 18px 18px 16px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.02); color: var(--text); text-decoration: none; transition: border-color .3s, background-color .3s; }
+  .xpost { flex: none; display: flex; flex-direction: column; gap: 12px; padding: 18px 18px 16px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255,255,255,.02); color: var(--text); text-decoration: none; transition: border-color .3s, background-color .3s; }
   .xpost:hover { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.04); }
   .xh { display: flex; align-items: center; gap: 10px; }
   .xav { width: 36px; height: 36px; border-radius: 50%; flex: none; }
@@ -211,7 +213,7 @@
   .xat { color: #8fb3ff; }
   .xq { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--muted); }
   .xqn b { color: var(--text); font-weight: 500; }
-  .xi { width: 100%; border-radius: 12px; display: block; aspect-ratio: 4 / 3; object-fit: cover; }
+  .xi { width: 100%; border-radius: 12px; display: block; max-height: 420px; object-fit: cover; }
   .xf { margin-top: auto; display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); padding-top: 4px; }
   .xpost:hover .xf span:last-child { color: var(--text); }
   .xcard { display: flex; align-items: center; gap: 18px; max-width: 600px; padding: 22px 24px; border-radius: 16px; border: 1px solid var(--line); text-decoration: none; color: var(--text); transition: border-color .3s, background-color .3s; }
@@ -467,7 +469,7 @@
   <section class="feed" id="feed">
     <header class="ph"><h2>Lately</h2><span class="pn">on X</span><a class="pl" href="https://x.com/yashwik" target="_blank" rel="noopener">@yashwik ↗</a></header>
     <div class="xtl" id="xtl" aria-live="polite"></div>
-    <div class="xposts" id="xposts"></div>
+    <div class="xposts" id="xposts" data-lenis-prevent tabindex="0" aria-label="Posts on X"></div>
     <a class="xcard" href="https://x.com/yashwik" target="_blank" rel="noopener">
       <span class="xmark" aria-hidden="true">𝕏</span>
       <span class="xbody"><span class="xline">What I’m building and what I’m learning, as it happens.</span><span class="xgo">Follow @yashwik ↗</span></span>
