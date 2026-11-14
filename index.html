@@ -353,6 +353,28 @@
     .pin { align-items: flex-start; }
     .pin .col { padding-top: calc(var(--gb, 52vh) + 30px); padding-bottom: 0; }
   }
+  /* ---- below the hero: shared ---- */
+  :root { --E: max(16px, var(--edge)); --acc: #f39a5c; }
+  .zlogo { background: none; padding: 0; color: var(--text); }
+  .zlogo svg path { fill: currentColor; }
+  .zlogo svg { height: clamp(22px, 2.2vw, 28px); }
+  .feed .ph { border-bottom: 0; }
+  .bio .lk { color: var(--text); }
+  /* ---- Option 5, Glass and light: the gateway's glow stays behind the page; everything sits on glass in front of it ---- */
+  .bglow { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .3s linear;
+    background: radial-gradient(60% 45% at var(--gx, 50%) 108%, rgba(255,146,82,.26), transparent 70%), radial-gradient(45% 40% at 12% -5%, rgba(110,140,255,.18), transparent 70%), radial-gradient(40% 35% at 95% 40%, rgba(200,120,190,.10), transparent 70%); }
+  main, .foot { position: relative; z-index: 1; }
+  main { --glass: linear-gradient(rgba(16,18,36,.58), rgba(16,18,36,.58)) padding-box, linear-gradient(145deg, rgba(127,156,255,.5), rgba(255,255,255,.05) 45%, rgba(255,146,82,.45)) border-box; --W: min(1180px, calc(100% - 2 * var(--E))); }
+  .bio { max-width: none; width: var(--W); margin: 12vh auto 4vh; padding: clamp(26px, 5vw, 64px); border: 1px solid transparent; border-radius: 28px; background: var(--glass); -webkit-backdrop-filter: blur(18px) saturate(120%); backdrop-filter: blur(18px) saturate(120%); box-sizing: border-box; }
+  .bio p { max-width: 34em; }
+  .say { max-width: none; width: var(--W); margin: 0 auto; padding: 0 0 14vh; justify-content: flex-start; align-items: center; }
+  .say button, .say .links a { padding: 10px 18px; border-radius: 999px; border: 1px solid transparent; background: var(--glass); background-size: auto; }
+  .zx, .work { width: var(--W); margin: 0 auto; padding-left: 0; padding-right: 0; box-sizing: border-box; }
+  .zc, .proj, .xpost { border: 1px solid transparent !important; background: var(--glass) !important; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  .proj { padding: clamp(22px, 4vw, 48px); border-radius: 28px; }
+  .nvpair .row3 .tile { background: transparent !important; }
+  #feed { max-width: 600px; }
+  @media (max-width: 760px) { .bio { margin-top: 6vh; border-radius: 22px; } .proj { border-radius: 22px; padding: 20px 16px; } .say { justify-content: flex-start; } }
 </style>
 </head>
 <body>
@@ -379,7 +401,7 @@
   <section class="bio" id="bio">
     <p>I have spent years close to how work actually gets done here. First on a finance desk. Then inside a company that delivers groceries in ten minutes. Then on shop floors, where the whole business lives in one WhatsApp group.</p>
     <p>Here is what I learned. The work is real and the people are sharp. The software rarely fits. It asks them to change. They do not, and they are right.</p>
-    <p>So I build AI that fits the way the work already happens, at ten orders a day or ten lakh. It speaks the language. It handles the mess. It asks before it touches money.</p>
+    <p>So the AI I build learns the work first, at ten orders a day or ten lakh. It speaks the language. It reads the handwriting. It asks before it touches money.</p>
     <p>These days I do that at <a class="lk" href="https://www.zepto.com">Zepto</a>. After hours, at <a class="lk" href="https://heyonit.xyz" data-img="onit-chat" data-pos="50% 30%">Onit</a>.</p>
   </section>
 
@@ -832,6 +854,17 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
     document.head.appendChild(s);
   }, { rootMargin: '600px 0px' });
   xio.observe($('#feed'));
+})();
+</script>
+<script>
+(function () { var $ = function (s) { return document.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  (function () {
+    var g = document.createElement('div'); g.className = 'bglow'; document.body.insertBefore(g, document.body.firstChild);
+    var hero = document.getElementById('top');
+    function upd() { var r = hero.getBoundingClientRect(); var k = Math.max(0, Math.min(1, (innerHeight - r.bottom) / innerHeight)); g.style.opacity = k.toFixed(3); g.style.setProperty('--gx', (innerWidth > 760 ? 80 - 30 * k : 50).toFixed(1) + '%'); requestAnimationFrame(upd); }
+    requestAnimationFrame(upd);
+  })();
+
 })();
 </script>
 </body>
