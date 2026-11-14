@@ -736,7 +736,7 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
   var HB = [0.22, 0.45, 0.68];
   function stageAt(p) { var s = 0; for (var i = 0; i < 3; i++) s += ease(clamp((p - (HB[i] - 0.09)) / 0.15)); return s; }
   function halfW(v) { return (v < 0 ? Math.sqrt(Math.max(0, 1 - v * v)) : 1) - 0.16; }
-  function gateGeom(W, H) { var wide = W > 760, gw = wide ? Math.min(W * 0.22, H * 0.46) : Math.min(W * 0.58, H * 0.3), gh = wide ? H * 0.7 : gw * 1.45, top = wide ? H * 0.15 : Math.max(H * 0.08, 74); return { wide: wide, gw: gw, gh: gh, cx: W * (wide ? 0.8 : 0.5) + mx * 4, top: top, base: top + gh, r: gw / 2, ay: top + gw / 2, vb: (gh - gw / 2) / (gw / 2) }; }
+  function gateGeom(W, H) { var wide = W > 760, gw = wide ? Math.min(W * 0.22, H * 0.46) : Math.min(W * 0.58, H * 0.3), top = wide ? H * 0.15 : Math.max(H * 0.08, 74), hh = wide ? 0 : ((document.getElementById('head') || {}).offsetHeight || 110), gh = wide ? H * 0.7 : Math.max(gw * 1.45, Math.min(H - top - hh - 104, gw * 2.25)); return { wide: wide, gw: gw, gh: gh, cx: W * (wide ? 0.8 : 0.5) + mx * 4, top: top, base: top + gh, r: gw / 2, ay: top + gw / 2, vb: (gh - gw / 2) / (gw / 2) }; }
   function gatePath(g, ins) { var rr = g.r - ins; ctx.beginPath(); ctx.moveTo(g.cx - rr, g.base); ctx.lineTo(g.cx - rr, g.ay); ctx.arc(g.cx, g.ay, rr, Math.PI, 0); ctx.lineTo(g.cx + rr, g.base); }
   function slots(g) { var a = -0.72, b = g.vb - 0.3; return [a + (b - a) * 0.17, a + (b - a) * 0.5, a + (b - a) * 0.83, (b - a) / 3]; }
   var WORDS = ['chaos', 'शोर', 'noise', 'signal', 'इरादा', 'intent', 'pattern', 'अर्थ', 'meaning', 'possibility', 'संभावना', 'order'];
