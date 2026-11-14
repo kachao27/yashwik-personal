@@ -194,6 +194,16 @@
   /* feed */
   .feed { max-width: 960px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 16vh max(16px, env(safe-area-inset-left, 0px)); }
   .feed .ph { border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .xtl { display: none; max-width: 600px; margin-bottom: 18px; }
+  .xtl.on { display: block; }
+  .xposts { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 0 18px; padding-bottom: 6px; }
+  .xposts::-webkit-scrollbar { display: none; }
+  .xposts.off { display: none; }
+  .xpost { flex: 0 0 min(380px, 86%); scroll-snap-align: start; margin: 0; }
+  .xpost .twitter-tweet { margin: 0 !important; }
+  .xpost .twitter-tweet-rendered, .xpost iframe { border-radius: 12px; overflow: hidden; color-scheme: dark; }
+  .xpost > a.xp { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-radius: 14px; border: 1px solid var(--line); color: var(--muted); font-size: 14px; text-decoration: none; transition: border-color .3s, color .3s; }
+  .xpost > a.xp:hover { color: var(--text); border-color: rgba(255,255,255,.32); }
   .xcard { display: flex; align-items: center; gap: 18px; max-width: 600px; padding: 22px 24px; border-radius: 16px; border: 1px solid var(--line); text-decoration: none; color: var(--text); transition: border-color .3s, background-color .3s; }
   .xcard:hover { border-color: rgba(255,255,255,.32); background-color: rgba(255,255,255,.025); }
   .xmark { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); font-size: 20px; }
@@ -446,6 +456,8 @@
 
   <section class="feed" id="feed">
     <header class="ph"><h2>Lately</h2><span class="pn">on X</span><a class="pl" href="https://x.com/yashwik" target="_blank" rel="noopener">@yashwik ↗</a></header>
+    <div class="xtl" id="xtl" aria-live="polite"></div>
+    <div class="xposts" id="xposts"></div>
     <a class="xcard" href="https://x.com/yashwik" target="_blank" rel="noopener">
       <span class="xmark" aria-hidden="true">𝕏</span>
       <span class="xbody"><span class="xline">What I’m building and what I’m learning, as it happens.</span><span class="xgo">Follow @yashwik ↗</span></span>
@@ -782,6 +794,21 @@ var IMG = {"pk-dash": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+
+  /* X: the live timeline shows only to visitors logged in to X. Everyone else sees seven chosen posts.
+     If X's script cannot load, each post stays a plain link. */
+  var XPOSTS = ['2110625560498233552', '2105348951352463789', '2103241089897636059', '2101960557285065017', '2101694839201173659', '2098117025000525972', '2092328006316654726'];
+  var xposts = $('#xposts'), xtl = $('#xtl');
+  XPOSTS.forEach(function (id, n) { var d = document.createElement('div'); d.className = 'xpost'; d.dataset.id = id; d.innerHTML = '<a class="xp" target="_blank" rel="noopener" href="https://x.com/yashwik/status/' + id + '"><span>Post ' + (n + 1) + ' on X</span><span>Read ↗</span></a>'; xposts.appendChild(d); });
+  function xReady(cb) { if (window.twttr && window.twttr.widgets) return cb(window.twttr); var s = document.createElement('script'); s.async = true; s.src = 'https://platform.twitter.com/widgets.js'; s.charset = 'utf-8'; s.onload = function () { if (window.twttr && window.twttr.ready) window.twttr.ready(cb); }; document.head.appendChild(s); }
+  var xStarted = false, xio = new IntersectionObserver(function (es) { if (!es[0].isIntersecting || xStarted) return; xStarted = true; xio.disconnect(); xReady(function (tw) {
+    $$('.xpost').forEach(function (d) { var box = document.createElement('div'); d.appendChild(box); tw.widgets.createTweet(d.dataset.id, box, { theme: 'dark', dnt: true, conversation: 'none', align: 'left' }).then(function (el) { if (el) { var a = d.querySelector('a.xp'); if (a) a.remove(); } else box.remove(); }); });
+    tw.widgets.createTimeline({ sourceType: 'profile', screenName: 'yashwik' }, xtl, { theme: 'dark', dnt: true, tweetLimit: 5, chrome: 'noheader nofooter noborders transparent' }).then(function (el) {
+      if (!el) return; xtl.classList.add('on');
+      setTimeout(function () { var h = el.getBoundingClientRect().height; if (h > 420) xposts.classList.add('off'); else { xtl.classList.remove('on'); xtl.innerHTML = ''; } }, 2500);
+    });
+  }); }, { rootMargin: '600px 0px' });
+  xio.observe($('#feed'));
 })();
 </script>
 </body>
